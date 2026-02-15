@@ -5,7 +5,7 @@ import Combine
 final class SearchViewModel: ObservableObject {
     @Published var searchQuery = ""
     @Published var employers: [Employer] = []
-    @Published var isLoading = false
+    @Published var isLoading = true
     @Published var errorMessage: String?
     @Published var selectedMinDiscount: Int? = nil
     @Published var selectedSort: SortOption = .nameAsc
@@ -13,6 +13,7 @@ final class SearchViewModel: ObservableObject {
     @Published var showFavoritesOnly: Bool = false
 
     private let searchUseCase: SearchEmployersUseCase
+    private var searchCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     init(searchUseCase: SearchEmployersUseCase) {
@@ -21,10 +22,16 @@ final class SearchViewModel: ObservableObject {
         setupFilterObserver()
         setupSortObserver()
         setupFavoritesObserver()
+        loadInitialData()
+    }
+
+    private func loadInitialData() {
+        performSearch(query: "")
     }
 
     private func setupSearchObserver() {
         $searchQuery
+            .dropFirst()
             .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] query in
@@ -64,7 +71,7 @@ final class SearchViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        searchUseCase.execute(
+        searchCancellable = searchUseCase.execute(
             query: query,
             minDiscount: selectedMinDiscount,
             sortBy: selectedSort
@@ -89,7 +96,6 @@ final class SearchViewModel: ObservableObject {
                 }
             }
         )
-        .store(in: &cancellables)
     }
 
     func retry() {

@@ -66,7 +66,7 @@ struct SearchView: View {
                     .padding(.vertical, AppSpacing.sm)
                 }
 
-                // Content
+                // Content — fills remaining space
                 Group {
                     if viewModel.isLoading {
                         LoadingView()
@@ -82,6 +82,7 @@ struct SearchView: View {
                         employersList
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .navigationTitle("Employers")
             .searchable(text: $viewModel.searchQuery, prompt: "Search by name or location")
@@ -134,7 +135,6 @@ struct SearchView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, AppSpacing.xl)
         }
-        .frame(maxHeight: .infinity)
     }
 
     private var sortMenu: some View {
