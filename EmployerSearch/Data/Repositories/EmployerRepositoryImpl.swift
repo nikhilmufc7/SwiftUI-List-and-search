@@ -27,8 +27,8 @@ final class EmployerRepositoryImpl: EmployerRepository {
             .handleEvents(receiveOutput: { [weak self] employers in
                 self?.cacheManager.save(employers: employers)
             })
-            .map { [weak self] employers in
-                self?.filterEmployers(employers, query: query) ?? []
+            .map { employers in
+                self.filterEmployers(employers, query: query)
             }
             .eraseToAnyPublisher()
     }

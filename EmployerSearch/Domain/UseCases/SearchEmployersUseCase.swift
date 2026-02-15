@@ -27,9 +27,7 @@ final class SearchEmployersUseCase {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
 
         return repository.searchEmployers(query: trimmedQuery)
-            .map { [weak self] employers in
-                guard let self = self else { return [] }
-
+            .map { employers in
                 // Filter by minimum discount
                 let filtered = employers.filter { employer in
                     guard let minDiscount = minDiscount else { return true }
